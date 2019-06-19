@@ -1,4 +1,0 @@
-Public DNS	ec2-3-19-26-129.us-east-2.compute.amazonaws.com
-User name	Administrator
-Password	
-dpZYfUGEsSC)b-uN23TysaP=b(Ga?uNn 
