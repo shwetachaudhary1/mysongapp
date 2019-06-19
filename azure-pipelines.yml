@@ -34,3 +34,42 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Publish
+  inputs:
+    command: publish
+    publishWebProjects: True
+    projects: ""
+    arguments: "--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)"
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifact
+  inputs:
+    PathtoPublish: "$(build.artifactstagingdirectory)"
+    ArtifactName: WebApp
+    ArtifactType: Container
+    TargetPath: "\\\\my\\share\\$(Build.DefinitionName)\\$(Build.BuildNumber)"
+
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 
+      Write-Host "Hello World"
+      Set-DefaultAWSRegion -Region us-east-1
+      Write-Host "Hello World from $Env:AGENT_NAME."
+      Write-Host "My ID is $Env:AGENT_ID."
+      Write-Host "AGENT_WORKFOLDER contents:"
+      gci $Env:AGENT_WORKFOLDER
+      Write-Host "AGENT_BUILDDIRECTORY contents:"
+      gci $Env:AGENT_BUILDDIRECTORY
+      Write-Host "BUILD_SOURCESDIRECTORY contents:"
+      gci $Env:BUILD_SOURCESDIRECTORY
+      Write-Host "Over and out."
+      $bucketName = "shwetadotnetbucket1";
+      Write-Host 'Setting up S3 source for pipeline:' $bucketName
+      Write-Host 'Writing artifacts to s3'
+      Write-Host 'Writing objects application to s3'
+      Write-S3Object -BucketName $bucketName -File $(build.artifactstagingdirectory) -Key 'webapp'
+      Get-AWSCmdletName -Service S3
